@@ -18,6 +18,8 @@ export type ChainDefinition = {
   readonly name: string;
   readonly explorerUrl: string;
   readonly isTestnet: boolean;
+  readonly safeWalletFactoryAddress: string;
+  readonly safeModuleAddress: string;
 };
 
 export const USE_TESTNET_ONLY =
@@ -31,6 +33,9 @@ const chainDefinitions: Readonly<Record<SupportedChainId, ChainDefinition>> = {
     name: "Arbitrum Sepolia",
     explorerUrl: "https://sepolia.arbiscan.io",
     isTestnet: true,
+    safeWalletFactoryAddress:
+      process.env.NEXT_PUBLIC_SAFE_WALLET_FACTORY_ADDRESS!,
+    safeModuleAddress: process.env.NEXT_PUBLIC_SAFE_MODULE_ADDRESS!,
   },
   [CHAIN_IDS.ARBITRUM_MAINNET]: {
     id: CHAIN_IDS.ARBITRUM_MAINNET,
@@ -38,6 +43,9 @@ const chainDefinitions: Readonly<Record<SupportedChainId, ChainDefinition>> = {
     name: "Arbitrum Mainnet",
     explorerUrl: "https://arbiscan.io",
     isTestnet: false,
+    safeWalletFactoryAddress:
+      process.env.NEXT_PUBLIC_MAINNET_SAFE_WALLET_FACTORY_ADDRESS!,
+    safeModuleAddress: process.env.NEXT_PUBLIC_MAINNET_SAFE_MODULE_ADDRESS!,
   },
 };
 
@@ -117,4 +125,28 @@ export function getDefaultChainForPrivy() {
  */
 export function getSupportedChainsForPrivy() {
   return USE_TESTNET_ONLY ? PRIVY_CHAINS_TESTNET : PRIVY_CHAINS_ALL;
+}
+
+/**
+ * Get Safe wallet factory address for a chain
+ */
+export function getSafeWalletFactoryAddress(chainId: number): string {
+  const info = chainDefinitions[chainId as SupportedChainId];
+  if (!info) {
+    console.warn(`Chain ID ${chainId} not supported`);
+    return "";
+  }
+  return info.safeWalletFactoryAddress;
+}
+
+/**
+ * Get Safe module address for a chain
+ */
+export function getSafeModuleAddress(chainId: number): string {
+  const info = chainDefinitions[chainId as SupportedChainId];
+  if (!info) {
+    console.warn(`Chain ID ${chainId} not supported`);
+    return "";
+  }
+  return info.safeModuleAddress;
 }

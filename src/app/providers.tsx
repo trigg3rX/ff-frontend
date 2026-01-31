@@ -20,7 +20,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     );
 
     // Get Privy App ID from environment variable
-    const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID || "";
+    const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID!;
 
     // Get chain configuration from centralized module
     const supportedChains = getSupportedChainsForPrivy();
