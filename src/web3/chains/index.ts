@@ -1,0 +1,120 @@
+/**
+ * Centralized blockchain chain configuration and helpers.
+ * All chain-specific values should live here to keep them in sync.
+ */
+
+import { arbitrum, arbitrumSepolia } from "viem/chains";
+
+export const CHAIN_IDS = {
+  ARBITRUM_SEPOLIA: 421614,
+  ARBITRUM_MAINNET: 42161,
+} as const;
+
+export type SupportedChainId = (typeof CHAIN_IDS)[keyof typeof CHAIN_IDS];
+
+export type ChainDefinition = {
+  readonly id: SupportedChainId;
+  readonly key: "testnet" | "mainnet";
+  readonly name: string;
+  readonly explorerUrl: string;
+  readonly isTestnet: boolean;
+};
+
+export const USE_TESTNET_ONLY =
+  process.env.NEXT_PUBLIC_USE_TESTNET_ONLY !== "false";
+
+// Chain definitions with readonly properties
+const chainDefinitions: Readonly<Record<SupportedChainId, ChainDefinition>> = {
+  [CHAIN_IDS.ARBITRUM_SEPOLIA]: {
+    id: CHAIN_IDS.ARBITRUM_SEPOLIA,
+    key: "testnet",
+    name: "Arbitrum Sepolia",
+    explorerUrl: "https://sepolia.arbiscan.io",
+    isTestnet: true,
+  },
+  [CHAIN_IDS.ARBITRUM_MAINNET]: {
+    id: CHAIN_IDS.ARBITRUM_MAINNET,
+    key: "mainnet",
+    name: "Arbitrum Mainnet",
+    explorerUrl: "https://arbiscan.io",
+    isTestnet: false,
+  },
+};
+
+// Pre-computed arrays (allocated once at module load)
+const ALL_CHAINS: ChainDefinition[] = [
+  chainDefinitions[CHAIN_IDS.ARBITRUM_SEPOLIA],
+  chainDefinitions[CHAIN_IDS.ARBITRUM_MAINNET],
+];
+
+const TESTNET_ONLY_CHAINS: ChainDefinition[] = [
+  chainDefinitions[CHAIN_IDS.ARBITRUM_SEPOLIA],
+];
+
+const PRIVY_CHAINS_ALL = [arbitrumSepolia, arbitrum];
+const PRIVY_CHAINS_TESTNET = [arbitrumSepolia];
+
+// Re-export viem chains
+export { arbitrum, arbitrumSepolia };
+export const VIEM_CHAINS = PRIVY_CHAINS_ALL;
+
+/**
+ * Type guard for supported chain IDs
+ */
+export function isSupportedChain(chainId: number): chainId is SupportedChainId {
+  return (
+    chainId === CHAIN_IDS.ARBITRUM_SEPOLIA ||
+    chainId === CHAIN_IDS.ARBITRUM_MAINNET
+  );
+}
+
+/**
+ * Get chain name, with fallback for unknown chains
+ */
+export function getChainName(chainId: number): string {
+  return (
+    chainDefinitions[chainId as SupportedChainId]?.name ?? `Chain ${chainId}`
+  );
+}
+
+/**
+ * Get chains available for user selection (respects USE_TESTNET_ONLY)
+ */
+export function getSelectableChains(): ChainDefinition[] {
+  return USE_TESTNET_ONLY ? TESTNET_ONLY_CHAINS : ALL_CHAINS;
+}
+
+/**
+ * Check if chain ID is testnet
+ */
+export function isTestnet(chainId: number | null | undefined): boolean {
+  return chainId === CHAIN_IDS.ARBITRUM_SEPOLIA;
+}
+
+/**
+ * Check if chain ID is mainnet
+ */
+export function isMainnet(chainId: number | null | undefined): boolean {
+  return chainId === CHAIN_IDS.ARBITRUM_MAINNET;
+}
+
+/**
+ * Get target chain ID for network switching
+ */
+export function getTargetChainId(toTestnet: boolean): number {
+  return toTestnet ? CHAIN_IDS.ARBITRUM_SEPOLIA : CHAIN_IDS.ARBITRUM_MAINNET;
+}
+
+/**
+ * Get default chain for Privy (respects USE_TESTNET_ONLY)
+ */
+export function getDefaultChainForPrivy() {
+  return USE_TESTNET_ONLY ? arbitrumSepolia : arbitrum;
+}
+
+/**
+ * Get supported chains for Privy (returns pre-computed array)
+ */
+export function getSupportedChainsForPrivy() {
+  return USE_TESTNET_ONLY ? PRIVY_CHAINS_TESTNET : PRIVY_CHAINS_ALL;
+}
