@@ -15,7 +15,6 @@ interface EthereumProvider {
 
 /**
  * Hook for interacting with Privy embedded wallet
- * Provides utilities for sending sponsored transactions and getting access tokens
  */
 export function usePrivyWallet() {
   const { authenticated, ready, getAccessToken } = usePrivy();

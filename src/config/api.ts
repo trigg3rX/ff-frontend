@@ -10,6 +10,10 @@ export const API_CONFIG = {
     META: {
       RUNTIME_CONFIG: "/meta/runtime-config",
     },
+    RELAY: {
+      CREATE_SAFE: "/relay/create-safe",
+      ENABLE_MODULE: "/relay/enable-module",
+    },
   },
 } as const;
 
