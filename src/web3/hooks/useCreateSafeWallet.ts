@@ -39,22 +39,22 @@ export const useCreateSafeWallet = () => {
       signedTxRef.current &&
       signedTxRef.current.chainId !== chainId
     ) {
-      console.warn(
-        `Chain changed from ${signedTxRef.current.chainId} to ${chainId}, clearing signed transaction`,
-      );
       signedTxRef.current = null;
     }
   }, [chainId]);
 
   // Create Safe wallet: Backend uses authenticated Privy wallet address from the access token
   const createSafeWallet = async (
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _userAddress: string,
+    targetChainId?: number,
   ): Promise<CreateSafeResult> => {
     setIsCreating(true);
     try {
+      // Use targetChainId if provided, otherwise fall back to current chainId
+      const effectiveChainId = targetChainId ?? chainId;
+
       // Check if chainId is available
-      if (!chainId) {
+      if (!effectiveChainId) {
         return {
           success: false,
           safeAddress: null,
@@ -63,16 +63,16 @@ export const useCreateSafeWallet = () => {
       }
 
       // Validate chain ID
-      if (!isSupportedChain(chainId)) {
+      if (!isSupportedChain(effectiveChainId)) {
         return {
           success: false,
           safeAddress: null,
-          error: `Unsupported chain. Please switch to Arbitrum Sepolia (${CHAIN_IDS.ARBITRUM_SEPOLIA}) or Arbitrum Mainnet (${CHAIN_IDS.ARBITRUM_MAINNET}). Current chain: ${chainId}`,
+          error: `Unsupported chain. Please switch to Arbitrum Sepolia (${CHAIN_IDS.ARBITRUM_SEPOLIA}) or Arbitrum Mainnet (${CHAIN_IDS.ARBITRUM_MAINNET}). Current chain: ${effectiveChainId}`,
         };
       }
 
       // Verify wallet is actually connected to the claimed chain
-      if (wallet) {
+      if (!targetChainId && wallet && chainId) {
         try {
           const provider = await wallet.getEthereumProvider();
           const actualChainId = await provider.request({
@@ -87,8 +87,8 @@ export const useCreateSafeWallet = () => {
               error: `Wallet chain mismatch. Expected ${getChainName(chainId)} but wallet is on chain ${actualChainIdNum}. Please switch networks.`,
             };
           }
-        } catch (chainCheckError) {
-          console.warn("Failed to verify wallet chain:", chainCheckError);
+        } catch {
+          // Failed to verify wallet chain
         }
       }
 
@@ -112,7 +112,7 @@ export const useCreateSafeWallet = () => {
             Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify({
-            chainId,
+            chainId: effectiveChainId,
           }),
         },
       );
