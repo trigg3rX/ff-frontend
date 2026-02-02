@@ -2,7 +2,7 @@
 
 import { Typography } from "@/components/ui/Typography";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { useSafeWalletContext } from "@/contexts/SafeWalletContext";
+import { useSafeWalletContext } from "@/context/SafeWalletContext";
 import {
   LuCircleCheck,
   LuCircleX,

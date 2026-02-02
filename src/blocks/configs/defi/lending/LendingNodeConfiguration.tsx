@@ -21,7 +21,7 @@ import {
     LuCircleArrowDown,
 } from "react-icons/lu";
 import { useWallets } from "@privy-io/react-auth";
-import { useSafeWalletContext } from "@/contexts/SafeWalletContext";
+import { useSafeWalletContext } from "@/context/SafeWalletContext";
 import {
     LendingProvider,
     LendingOperation,
@@ -340,7 +340,7 @@ export function LendingNodeConfiguration({
             await navigator.clipboard.writeText(effectiveWalletAddress);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
-        } catch (error) {
+        } catch {
             //Failed to copy address:
         }
     }, [effectiveWalletAddress]);

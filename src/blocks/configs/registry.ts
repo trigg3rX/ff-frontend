@@ -94,7 +94,7 @@ function autoRegisterConfigComponents() {
       }
     });
 
-  } catch (error) {
+  } catch {
     //Auto-registration error:
   }
 }

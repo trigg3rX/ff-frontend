@@ -6,7 +6,7 @@ import { SimpleCard } from "@/components/ui/SimpleCard";
 import { cn } from "@/lib/utils";
 import { LuWallet } from "react-icons/lu";
 import { ConnectionHandle } from "./ConnectionHandle";
-import { useWorkflow } from "@/contexts/WorkflowContext";
+import { useWorkflow } from "@/context/WorkflowContext";
 import { generateIconRegistry } from "../registry";
 
 export interface WalletNodeData {

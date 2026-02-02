@@ -64,7 +64,7 @@ function TelegramNodeConfigurationInner({
             await navigator.clipboard.writeText(text);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
-        } catch (err) {
+        } catch {
             // console.error('Failed to copy:', err);
         }
     }, []);
@@ -87,7 +87,7 @@ function TelegramNodeConfigurationInner({
                 const data = await response.json();
                 setMessages(data.data.messages || []);
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to load messages:", error);
         } finally {
             setLoadingMessages(false);

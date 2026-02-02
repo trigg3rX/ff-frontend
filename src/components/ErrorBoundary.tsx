@@ -33,10 +33,10 @@ export class ErrorBoundary extends Component<
         return { hasError: true, error };
     }
 
-    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
         // Log to error tracking service (e.g., Sentry)
         // console.error("ErrorBoundary caught an error:", error, errorInfo);
-    }
+    // }
 
     handleReset = () => {
         this.setState({ hasError: false, error: null });

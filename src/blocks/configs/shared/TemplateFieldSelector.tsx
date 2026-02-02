@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { LuChevronDown, LuChevronUp, LuZap, LuPlus } from "react-icons/lu";
 import { Typography } from "@/components/ui/Typography";
 import { SimpleCard } from "@/components/ui/SimpleCard";
-import { useWorkflow } from "@/contexts/WorkflowContext";
+import { useWorkflow } from "@/context/WorkflowContext";
 import type { Node, Edge } from "reactflow";
 
 /**

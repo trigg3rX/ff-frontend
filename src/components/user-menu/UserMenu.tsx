@@ -74,7 +74,7 @@ export function UserMenu() {
       }
 
       await embeddedWallet.switchChain(targetChainId);
-    } catch (error) {
+    } catch {
       // console.error('Failed to switch chain:', error);
     }
   };

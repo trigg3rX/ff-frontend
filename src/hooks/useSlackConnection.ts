@@ -198,7 +198,7 @@ export function useSlackConnection({
                 const data = await response.json();
                 setConnections(data.data.connections || []);
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to load connections:", error);
         } finally {
             setLoading(prev => ({ ...prev, connections: false }));
@@ -227,7 +227,7 @@ export function useSlackConnection({
                 const data = await response.json();
                 setChannels(data.data.channels || []);
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to load channels:", error);
             showNotification("error", "Failed to load channels");
         } finally {
@@ -622,7 +622,7 @@ export function useSlackConnection({
                                     }, 150);
                                 }
                             }
-                        } catch (err) {
+                        } catch {
                             // console.error("Failed to load connections after OAuth:", err);
                         }
                     }

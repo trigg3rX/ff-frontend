@@ -5,7 +5,7 @@ import { Position, NodeProps } from "reactflow";
 import { cn } from "@/lib/utils";
 import { SimpleCard } from "@/components/ui/SimpleCard";
 import { ConnectionHandle } from "./ConnectionHandle";
-import { useWorkflow } from "@/contexts/WorkflowContext";
+import { useWorkflow } from "@/context/WorkflowContext";
 import { generateIconRegistry } from "../registry";
 
 export interface StartNodeData {

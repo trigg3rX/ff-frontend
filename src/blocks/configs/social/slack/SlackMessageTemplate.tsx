@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Typography } from "@/components/ui/Typography";
 import { SlackNotificationBanner } from "./SlackNotificationBanner";
 import { TemplateFieldSelector } from "@/blocks/configs/shared/TemplateFieldSelector";
-import { useWorkflow } from "@/contexts/WorkflowContext";
+import { useWorkflow } from "@/context/WorkflowContext";
 import type { SlackNotification, SlackLoadingState } from "@/types/slack";
 
 interface SlackMessageTemplateProps {

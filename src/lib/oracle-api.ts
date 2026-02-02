@@ -58,7 +58,7 @@ export async function fetchAvailableFeeds(
 
     // console.error("Failed to fetch feeds:", response.error);
     return null;
-  } catch (error) {
+  } catch {
     // console.error("Error fetching feeds:", error);
     return null;
   }
@@ -83,7 +83,7 @@ export async function fetchOracleConfig(
 
     // console.error("Failed to fetch oracle config:", response.error);
     return null;
-  } catch (error) {
+  } catch {
     // console.error("Error fetching oracle config:", error);
     return null;
   }

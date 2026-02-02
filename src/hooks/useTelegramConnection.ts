@@ -135,7 +135,7 @@ export function useTelegramConnection({
                 const errData = await response.json().catch(() => ({}));
                 showNotification("error", errData.error?.message || "Failed to load bot info");
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to load bot info:", error);
         } finally {
             setLoading((prev) => ({ ...prev, bot: false }));
@@ -164,7 +164,7 @@ export function useTelegramConnection({
             } else {
                 showNotification("error", "Failed to load chats");
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to load chats:", error);
             showNotification("error", "Failed to load chats");
         } finally {
@@ -198,7 +198,7 @@ export function useTelegramConnection({
                     }
                 }
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to load connections:", error);
         } finally {
             setLoading((prev) => ({ ...prev, connections: false }));
@@ -251,7 +251,7 @@ export function useTelegramConnection({
                 const errData = await response.json().catch(() => ({}));
                 showNotification("error", errData.error?.message || "Failed to save connection");
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to save connection:", error);
             showNotification("error", "Failed to save connection");
         } finally {
@@ -287,7 +287,7 @@ export function useTelegramConnection({
                 await loadConnections();
                 showNotification("success", "Connection deleted");
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to delete connection:", error);
             showNotification("error", "Failed to delete connection");
         }
@@ -334,7 +334,7 @@ export function useTelegramConnection({
                 const errData = await response.json().catch(() => ({}));
                 showNotification("error", errData.error?.message || "Failed to send message");
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to send message:", error);
             showNotification("error", "Failed to send message");
         } finally {
@@ -393,7 +393,7 @@ export function useTelegramConnection({
                 const errData = await response.json().catch(() => ({}));
                 showNotification("error", errData.error?.message || "Failed to generate verification code");
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to generate verification code:", error);
             showNotification("error", "Failed to generate verification code");
         } finally {
@@ -427,7 +427,7 @@ export function useTelegramConnection({
                     setVerificationCode(null);
                 }
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to check verification status:", error);
         } finally {
             setLoading((prev) => ({ ...prev, verification: false }));
@@ -454,7 +454,7 @@ export function useTelegramConnection({
                 setVerificationStatus(null);
                 showNotification("info", "Verification cancelled. You can generate a new code.");
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to cancel verification:", error);
         } finally {
             setLoading((prev) => ({ ...prev, verification: false }));

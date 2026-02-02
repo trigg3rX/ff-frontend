@@ -21,7 +21,7 @@ import {
 } from "react-icons/lu";
 import { useWallets } from "@privy-io/react-auth";
 import { ethers } from "ethers";
-import { useSafeWalletContext } from "@/contexts/SafeWalletContext";
+import { useSafeWalletContext } from "@/context/SafeWalletContext";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
 import Safe from "@safe-global/protocol-kit";
 import { isTestnet } from "@/web3/chains";
