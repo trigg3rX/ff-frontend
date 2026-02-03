@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { LuChevronDown } from "react-icons/lu";
 
 export interface Category {
   id: string;
@@ -73,7 +73,7 @@ export function CategoryDropdown({
           </span>
         </div>
 
-        <ChevronDown
+        <LuChevronDown
           className={`w-4 h-4 text-white shrink-0 transition-all duration-300 relative z-10 ${dropdownOpen ? "rotate-180" : "group-hover:rotate-90"
             }`}
         />
