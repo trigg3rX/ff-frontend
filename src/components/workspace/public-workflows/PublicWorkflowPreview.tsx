@@ -168,7 +168,7 @@ function PublicWorkflowPreviewInner({ workflowId }: PublicWorkflowPreviewProps) 
         // );
         setIsCloning(false);
       }
-    } catch (error) {
+    } catch {
       // console.error("Error cloning workflow:", error);
       // alert(
       //   `Error cloning workflow: ${error instanceof Error ? error.message : String(error)}`
