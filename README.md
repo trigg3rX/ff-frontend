@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FlowForge Frontend
 
-## Getting Started
+Next.js app with React Flow canvas, block-based node library, Privy and Safe wallet integration. Part of the FlowForge stack—communicates with the backend API for workflows, swap/lending, and integrations.
 
-First, run the development server:
+## Project Structure
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+frontend/
+├── src/
+│   ├── app/              # Next.js App Router (automation-builder, workflows, public-workflows)
+│   ├── blocks/           # Definitions, configs, nodes (see src/blocks/README.md)
+│   ├── components/       # UI, layout, workspace
+│   ├── config/           # API, AI config
+│   ├── context/          # Workflow, onboarding, Safe
+│   ├── hooks/            # Custom hooks
+│   ├── lib/              # API client, utils
+│   ├── types/            # TypeScript types
+│   ├── utils/            # Canvas, workflow helpers
+│   └── web3/             # Chains, Safe, Privy
+├── public/
+└── package.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup & Run
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Prerequisites:** Node.js 20+, running backend
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+yarn
+```
 
-## Learn More
+Create `.env.local` with:
 
-To learn more about Next.js, take a look at the following resources:
+| Variable | Description |
+| -------- | ----------- |
+| `NEXT_PUBLIC_API_BASE_URL` | Backend API base URL (no trailing slash), e.g. `http://localhost:3000/api/v1` |
+| `NEXT_PUBLIC_PRIVY_APP_ID` | Privy app ID for embedded wallet auth |
+| `NEXT_PUBLIC_USE_TESTNET_ONLY` | `true` for testnet-only mode |
+| `NEXT_PUBLIC_SAFE_WALLET_FACTORY_ADDRESS` | Safe factory (testnet) |
+| `NEXT_PUBLIC_SAFE_MODULE_ADDRESS` | Safe module (testnet) |
+| `NEXT_PUBLIC_MAINNET_SAFE_WALLET_FACTORY_ADDRESS` | Safe factory (mainnet) |
+| `NEXT_PUBLIC_MAINNET_SAFE_MODULE_ADDRESS` | Safe module (mainnet) |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+yarn run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Command | Description |
+| ------- | ----------- |
+| `yarn run dev` | Start dev server |
+| `yarn run build` | Build for production |
+| `yarn run start` | Start production server |
+| `yarn run lint` | ESLint |
 
-## Deploy on Vercel
+## Block system
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Blocks use a convention-based structure. Each block has:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Definition** (`src/blocks/definitions/`) — Metadata and backend type mapping
+- **Config** (`src/blocks/configs/`) — Sidebar configuration UI
+- **Node** (`src/blocks/nodes/`) — Canvas node component
+
+See `src/blocks/README.md` for naming conventions and how to add new blocks.
+
+## Tech stack
+
+Next.js 16, React 19, React Flow, Tailwind v4, Radix UI, CVA, Privy, Safe (protocol-kit, api-kit), viem, ethers, TanStack Query.
+
+## LICENSE
+
+[MIT License](LICENSE)
