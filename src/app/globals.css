@@ -14,7 +14,9 @@ html {
 body {
   background: #000000;
   color: #ffffff;
-  font-feature-settings: "rlig" 1, "calt" 1;
+  font-feature-settings:
+    "rlig" 1,
+    "calt" 1;
 }
 
 /* Custom scrollbar for dark theme */
@@ -45,4 +47,94 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* React Flow: allow handles (connection circles) to show outside node bounds */
+.react-flow__node {
+  overflow: visible !important;
+}
+
+.react-flow__node-default {
+  padding: 0;
+}
+
+/* Custom connection handle - small circle, theme aligned with FormInput (white/5, white/10, white/50) */
+/* Hidden by default; show on node hover or when node is selected (clicked) */
+.react-flow__handle.connection-handle {
+  width: 12px !important;
+  height: 12px !important;
+  min-width: 12px !important;
+  min-height: 12px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 50% !important;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+/* Show handles on hover, when node is selected, when node has edges, or when dragging/valid target */
+.react-flow__node:hover .react-flow__handle.connection-handle,
+.react-flow__node.selected .react-flow__handle.connection-handle,
+.react-flow__node .has-edges .react-flow__handle.connection-handle,
+.react-flow__handle.connection-handle.react-flow__handle-connecting,
+.react-flow__handle.connection-handle.react-flow__handle-valid {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.react-flow__handle.connection-handle::after {
+  display: none;
+}
+
+.react-flow__handle.connection-handle .connection-handle-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.react-flow__handle.connection-handle .connection-handle-label {
+  color: #ffffff;
+  line-height: 1;
+  font-size: 7px;
+  font-weight: 600;
+}
+
+.react-flow__handle.connection-handle:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.react-flow__handle.connection-handle-source {
+  /* Output: where to start drawing an edge */
+}
+
+.react-flow__handle.connection-handle-target {
+  /* Input: where to connect an edge */
+}
+
+/* True handle - theme white accents */
+.react-flow__handle.connection-handle-true {
+  background: rgba(56, 192, 51, 0.08) !important;
+  border-color: rgba(56, 192, 51, 0.25) !important;
+}
+
+/* False handle - subtle red for error/destructive (FormInput uses border-red-500 for error) */
+.react-flow__handle.connection-handle-false {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.5) !important;
+}
+
+/* Connecting handle - focus state like FormInput focus:border-white/50 */
+.react-flow__handle.connection-handle.react-flow__handle-connecting,
+.react-flow__handle.connection-handle.react-flow__handle-valid {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Hide React Flow attribution/link */
+.react-flow__attribution {
+  display: none !important;
 }
