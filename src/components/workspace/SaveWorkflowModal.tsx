@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { LuX } from "react-icons/lu";
+import { LuX, LuSave, LuLock, LuGlobe, LuTag } from "react-icons/lu";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Textarea } from "@/components/ui/Textarea";
+import { FormInput } from "@/components/ui/FormInput";
 import { Label } from "@/components/ui/Label";
 import { generateTagsFromNodes } from "@/utils/workflow-tags";
 import { WORKFLOW_CONSTANTS } from "@/constants/workflow";
@@ -37,6 +36,7 @@ export function SaveWorkflowModal({
     nodes,
     currentVersion = 1,
     currentWorkflowId,
+    // currentTags = [], // Not currently used as we auto-generate
     isPublic = false,
 }: SaveWorkflowModalProps) {
     const [editedName, setEditedName] = useState(workflowName);
@@ -50,20 +50,6 @@ export function SaveWorkflowModal({
 
     // Auto-generate tags from nodes
     const autoTags = useMemo(() => generateTagsFromNodes(nodes), [nodes]);
-
-    const handleDescriptionChange = (
-        e: React.ChangeEvent<HTMLTextAreaElement>
-    ) => {
-        const newValue = e.target.value;
-
-        // Only enforce limit for public workflows
-        if (visibility === "public" && newValue.length > WORKFLOW_CONSTANTS.MAX_DESCRIPTION_LENGTH) {
-            return;
-        }
-
-        setDescription(newValue);
-        setErrors({ ...errors, description: undefined });
-    };
 
     const validate = (): boolean => {
         const newErrors: {
@@ -115,166 +101,144 @@ export function SaveWorkflowModal({
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-background"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
             role="dialog"
             aria-modal="true"
             aria-labelledby="save-workflow-title"
         >
             {/* Backdrop */}
             <div
-                className="fixed inset-0 bg-background backdrop-blur-md"
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
                 onClick={handleBackdropClick}
                 aria-hidden="true"
             />
 
             {/* Modal Content */}
             <div
-                className="relative z-50 w-full max-w-lg bg-black/95 border-white/20 border rounded-xl shadow-lg animate-in fade-in-0 zoom-in-95 duration-200 mx-4"
+                className="relative z-50 w-full max-w-md bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl shadow-black/50 animate-in fade-in-0 zoom-in-95 duration-200 overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
+                {/* Close — absolute to modal */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 z-10 rounded-lg p-2 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80 transition-colors"
+                    aria-label="Close"
+                >
+                    <LuX className="h-5 w-5" />
+                </button>
+
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-                    <div className="flex items-center gap-3">
-                        <h2
-                            id="save-workflow-title"
-                            className="text-xl font-semibold text-foreground"
-                        >
-                            Save Workflow
-                        </h2>
-                        {currentWorkflowId ? (
-                            <span className="px-2 py-0.5 text-xs bg-blue-500/20 text-blue-400 rounded-full">
-                                v.{currentVersion} → v.{currentVersion + 1}
-                            </span>
-                        ) : (
-                            <span className="px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded-full">
-                                New
-                            </span>
-                        )}
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="text-muted-foreground hover:text-foreground transition-colors rounded-lg p-1 hover:bg-white/5"
-                        aria-label="Close"
+                <div className="px-6 pt-5 pb-4">
+                    <h2
+                        id="save-workflow-title"
+                        className="text-xl font-semibold text-zinc-100 text-center py-4"
                     >
-                        <LuX className="w-5 h-5" />
-                    </button>
+                        Save Workflow<span className="ml-1 text-xs text-amber-600">({currentWorkflowId ? `v.${currentVersion + 1}` : "New"})</span>
+                    </h2>
                 </div>
 
                 {/* Body */}
-                <div className="px-6 py-5 space-y-5 max-h-[calc(100vh-200px)] overflow-y-auto">
+                <div className="px-6 pb-5 space-y-5 max-h-[calc(100vh-220px)] overflow-y-auto">
                     {/* Workflow Name */}
-                    <div className="space-y-2">
-                        <Label htmlFor="workflow-name" required>
-                            Workflow Name
-                        </Label>
-                        <Input
-                            id="workflow-name"
-                            type="text"
-                            value={editedName}
-                            onChange={(e) => {
-                                setEditedName(e.target.value);
-                                setErrors({ ...errors, name: undefined });
-                            }}
-                            placeholder="Enter workflow name..."
-                            error={errors.name}
-                        />
-                    </div>
+                    <FormInput
+                        id="workflow-name"
+                        label="Workflow Name"
+                        required
+                        type="text"
+                        value={editedName}
+                        onValueChange={(value) => {
+                            setEditedName(value);
+                            setErrors({ ...errors, name: undefined });
+                        }}
+                        placeholder="e.g. Email digest, Data sync..."
+                        error={errors.name}
+                        className="bg-zinc-900/80 border-zinc-700 focus:border-amber-500/50 focus:ring-amber-500/20"
+                    />
 
-                    {/* Visibility Radio */}
+                    {/* Visibility — card-style toggle */}
                     <div className="space-y-2">
-                        <Label>Visibility</Label>
-                        <div className="space-y-3">
-                            <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-white/5 transition-colors">
-                                <input
-                                    type="radio"
-                                    name="visibility"
-                                    value="private"
-                                    checked={visibility === "private"}
-                                    onChange={(e) => setVisibility(e.target.value as "private")}
-                                    className="w-4 h-4 mt-0.5 text-primary focus:ring-primary focus:ring-offset-0"
-                                />
-                                <div className="flex-1">
-                                    <div className="text-sm font-medium text-foreground">
-                                        Private
-                                    </div>
-                                    <div className="text-xs text-muted-foreground mt-0.5">
-                                        Only you can access this workflow
-                                    </div>
+                        <Label className="text-zinc-300">Visibility</Label>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setVisibility("private")}
+                                className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-left transition-all ${visibility === "private"
+                                    ? "border-amber-500/50 bg-amber-500/10 text-zinc-100"
+                                    : "border-zinc-700 bg-zinc-900/50 text-zinc-400 hover:border-zinc-600 hover:bg-zinc-800/50"
+                                    }`}
+                            >
+                                <LuLock className={`h-6 w-6 ${visibility === "private" ? "text-amber-500" : "text-zinc-500"}`} />
+                                <div>
+                                    <span className="block text-sm font-medium text-center">Private</span>
+                                    <span className="block text-xs opacity-80 mt-0.5 text-center">Only you</span>
                                 </div>
-                            </label>
-                            <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-white/5 transition-colors">
-                                <input
-                                    type="radio"
-                                    name="visibility"
-                                    value="public"
-                                    checked={visibility === "public"}
-                                    onChange={(e) => setVisibility(e.target.value as "public")}
-                                    className="w-4 h-4 mt-0.5 text-primary focus:ring-primary focus:ring-offset-0"
-                                />
-                                <div className="flex-1">
-                                    <div className="text-sm font-medium text-foreground">
-                                        Public
-                                    </div>
-                                    <div className="text-xs text-muted-foreground mt-0.5">
-                                        Anyone can discover and use this workflow
-                                    </div>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setVisibility("public")}
+                                className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 text-left transition-all ${visibility === "public"
+                                    ? "border-amber-500/50 bg-amber-500/10 text-zinc-100"
+                                    : "border-zinc-700 bg-zinc-900/50 text-zinc-400 hover:border-zinc-600 hover:bg-zinc-800/50"
+                                    }`}
+                            >
+                                <LuGlobe className={`h-6 w-6 ${visibility === "public" ? "text-amber-500" : "text-zinc-500"}`} />
+                                <div>
+                                    <span className="block text-sm font-medium text-center">Public</span>
+                                    <span className="block text-xs opacity-80 mt-0.5 text-center">Discoverable</span>
                                 </div>
-                            </label>
+                            </button>
                         </div>
                     </div>
 
                     {/* Public-specific fields */}
                     {visibility === "public" && (
-                        <div className="space-y-5 pt-2 border-t border-white/10">
-                            {/* Description with character limit */}
-                            <div className="space-y-2">
-                                <Label htmlFor="description" required>
-                                    Description
-                                </Label>
-                                <Textarea
-                                    id="description"
-                                    value={description}
-                                    onChange={handleDescriptionChange}
-                                    placeholder="Describe what this workflow does..."
-                                    rows={3}
-                                    error={errors.description}
-                                    className="resize-none"
-                                />
-                                {!errors.description && (
-                                    <p className="text-xs text-muted-foreground">
-                                        {description.length}/{WORKFLOW_CONSTANTS.MAX_DESCRIPTION_LENGTH} characters
-                                    </p>
-                                )}
-                            </div>
+                        <div className="space-y-5 pt-4 border-t border-zinc-800">
+                            <FormInput
+                                id="description"
+                                as="textarea"
+                                label="Description"
+                                required
+                                error={errors.description}
+                                onValueChange={(value) => {
+                                    if (visibility === "public" && value.length > WORKFLOW_CONSTANTS.MAX_DESCRIPTION_LENGTH) return;
+                                    setDescription(value);
+                                    setErrors({ ...errors, description: undefined });
+                                }}
+                                helperText={!errors.description ? `${description.length} / ${WORKFLOW_CONSTANTS.MAX_DESCRIPTION_LENGTH}` : undefined}
+                                textareaProps={{
+                                    value: description,
+                                    placeholder: "Describe what this workflow does...",
+                                    rows: 3,
+                                }}
+                                className="resize-none bg-zinc-900/80 border-zinc-700 focus:border-amber-500/50 focus:ring-amber-500/20"
+                            />
 
-                            {/* Auto-generated Tags (read-only) */}
                             <div className="space-y-2">
-                                <Label>
-                                    Tags{" "}
-                                    <span className="text-muted-foreground text-xs font-normal">
-                                        (auto-generated)
-                                    </span>
+                                <Label className="flex items-center gap-1.5 text-zinc-300">
+                                    <LuTag className="h-3.5 w-3.5" />
+                                    Tags
+                                    <span className="text-zinc-500 font-normal text-xs">(from nodes)</span>
                                 </Label>
                                 {autoTags.length > 0 ? (
-                                    <div className="flex flex-wrap gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
+                                    <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-zinc-900/60 border border-zinc-800">
                                         {autoTags.map((tag) => (
                                             <span
                                                 key={tag}
-                                                className="inline-flex items-center px-3 py-1.5 bg-primary/20 text-primary text-sm rounded-md font-medium border border-primary/30"
+                                                className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg bg-amber-500/15 text-amber-400 border border-amber-500/25"
                                             >
                                                 {tag}
                                             </span>
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="p-3 bg-white/5 rounded-lg border border-white/10">
-                                        <p className="text-sm text-muted-foreground text-center">
-                                            Add nodes to your workflow to generate tags automatically
+                                    <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800 border-dashed">
+                                        <p className="text-sm text-zinc-500 text-center">
+                                            Add nodes to generate tags automatically
                                         </p>
                                     </div>
                                 )}
                                 {errors.tags && (
-                                    <p className="text-xs text-destructive">{errors.tags}</p>
+                                    <p className="text-xs text-red-400">{errors.tags}</p>
                                 )}
                             </div>
                         </div>
@@ -282,19 +246,19 @@ export function SaveWorkflowModal({
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/10">
+                <div className="flex items-center justify-end gap-3 px-6 py-4 bg-zinc-900/30 border-t border-zinc-800">
                     <Button
                         onClick={onClose}
-                        // variant="secondary"
-                        className="min-w-[100px]"
+                        className="flex-1"
                     >
                         Cancel
                     </Button>
                     <Button
                         onClick={handleSave}
-                        className="min-w-[100px] bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                        className="flex-1 "
                     >
-                        Save Workflow
+                        <LuSave className="h-4 w-4 mr-1.5 inline" />
+                        Save
                     </Button>
                 </div>
             </div>

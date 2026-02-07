@@ -3,7 +3,6 @@
 import React, { useState, useMemo } from "react";
 import { LuChevronDown, LuChevronUp, LuZap, LuPlus } from "react-icons/lu";
 import { Typography } from "@/components/ui/Typography";
-import { SimpleCard } from "@/components/ui/SimpleCard";
 import { useWorkflow } from "@/context/WorkflowContext";
 import type { Node, Edge } from "reactflow";
 
@@ -208,28 +207,29 @@ export function TemplateFieldSelector({
 
   if (previousNodes.length === 0) {
     return (
-      <SimpleCard className="p-3 border-dashed">
-        <Typography variant="caption" className="text-muted-foreground text-center">
+      <div className="rounded-lg border border-dashed border-white/20 bg-white/5 px-4 py-3">
+        <Typography variant="caption" className="text-muted-foreground text-center text-xs leading-relaxed">
           No previous blocks connected. Connect blocks to see available fields.
         </Typography>
-      </SimpleCard>
+      </div>
     );
   }
 
   return (
-    <SimpleCard className="p-3 space-y-2 border-primary/20 bg-primary/5">
-      <div className="flex items-center gap-2">
-        <LuZap className="w-4 h-4 text-primary" />
+    <div className="rounded-lg border border-white/10 bg-white/5 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center gap-2 px-3 py-2.5 border-b border-white/10">
+        <LuZap className="w-3.5 h-3.5 text-primary shrink-0" />
         <Typography variant="caption" className="font-semibold text-foreground">
-          Use Previous Blocks Output
+          Previous blocks output
         </Typography>
       </div>
+      <p className="px-3 pt-1.5 pb-2 text-muted-foreground text-xs">
+        Click a field to insert it into your prompt.
+      </p>
 
-      <Typography variant="caption" className="text-muted-foreground block">
-        Click any field below to insert it into your message:
-      </Typography>
-
-      <div className="space-y-1 max-h-64 overflow-y-auto">
+      {/* Block list */}
+      <div className="space-y-1.5 px-2 pb-2 max-h-56 overflow-y-auto">
         {previousNodes.map((node) => {
           const nodeId = node.id;
           const blockName = (node.data?.label as string) || node.type || "Unknown Block";
@@ -237,25 +237,28 @@ export function TemplateFieldSelector({
           const isExpanded = expandedBlocks.has(nodeId);
 
           return (
-            <div key={nodeId} className="border border-border rounded-lg overflow-hidden">
+            <div
+              key={nodeId}
+              className="rounded-lg border border-white/15 overflow-hidden bg-black/20"
+            >
               <button
                 type="button"
                 onClick={() => toggleBlock(nodeId)}
-                className="w-full flex items-center justify-between p-2 hover:bg-secondary/50 transition-colors"
+                className="w-full flex items-center justify-between gap-2 px-2.5 py-2 text-left hover:bg-white/5 active:bg-white/10 transition-colors"
               >
-                <Typography variant="caption" className="font-medium text-foreground">
+                <Typography variant="caption" className="font-medium text-foreground truncate">
                   {blockName}
                 </Typography>
                 {isExpanded ? (
-                  <LuChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
+                  <LuChevronUp className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                 ) : (
-                  <LuChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+                  <LuChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                 )}
               </button>
 
               {isExpanded && (
-                <div className="p-2 space-y-1 bg-background border-t border-border">
-                  {/* Primary action: Insert best default field */}
+                <div className="px-2 pb-2 pt-0.5 space-y-1 border-t border-white/15">
+                  {/* Recommended insert — Swap-style panel */}
                   {(() => {
                     const nodeType = node.type || "";
                     const defaultField = getDefaultFieldForNodeType(nodeType);
@@ -263,54 +266,54 @@ export function TemplateFieldSelector({
                       ? `{{blocks.${nodeId}.${defaultField}}}`
                       : `{{blocks.${nodeId}}}`;
                     const buttonLabel = defaultField
-                      ? `Insert ${defaultField.charAt(0).toUpperCase() + defaultField.slice(1)} (Recommended)`
-                      : "Insert Entire Output (JSON)";
+                      ? `Insert ${defaultField.charAt(0).toUpperCase() + defaultField.slice(1)}`
+                      : "Insert entire output (JSON)";
 
                     return (
                       <button
                         type="button"
                         onClick={() => handleInsertEntireOutput(nodeId, nodeType)}
-                        className="w-full flex items-center justify-between p-2 rounded bg-primary/10 hover:bg-primary/20 transition-colors group border border-primary/30"
+                        className="w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md bg-white/10 hover:bg-white/15 border border-white/15 transition-colors group text-left"
                       >
-                        <div className="flex-1 text-left">
-                          <Typography variant="caption" className="text-primary font-semibold">
+                        <div className="flex-1 min-w-0">
+                          <span className="text-xs font-medium text-foreground block truncate">
                             {buttonLabel}
-                          </Typography>
-                          <Typography variant="caption" className="text-muted-foreground text-xs block">
+                          </span>
+                          <span className="text-[10px] text-muted-foreground font-mono block truncate mt-0.5">
                             {placeholderPreview}
-                          </Typography>
+                          </span>
                         </div>
-                        <LuPlus className="w-3.5 h-3.5 text-primary" />
+                        <LuPlus className="w-3.5 h-3.5 text-foreground shrink-0" />
                       </button>
                     );
                   })()}
 
-                  {/* Optional: Show known fields for certain node types */}
+                  {/* Specific fields */}
                   {fields.length > 0 && (
                     <>
-                      <div className="pt-1 pb-1">
-                        <Typography variant="caption" className="text-muted-foreground text-xs">
-                          Or insert specific fields:
-                        </Typography>
+                      <Typography variant="caption" className="text-muted-foreground text-xs font-medium pt-1 px-0.5 block">
+                        Or specific fields:
+                      </Typography>
+                      <div className="space-y-0.5">
+                        {fields.map((field) => (
+                          <button
+                            key={field.path}
+                            type="button"
+                            onClick={() => handleInsertField(`blocks.${nodeId}.${field.path}`)}
+                            className="w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md hover:bg-white/5 active:bg-white/10 transition-colors group text-left"
+                          >
+                            <div className="flex-1 min-w-0">
+                              <span className="text-xs font-medium text-foreground block truncate">
+                                {field.label}
+                              </span>
+                              <span className="text-[11px] text-muted-foreground font-mono block truncate">
+                                {`{{blocks.${nodeId}.${field.path}}}`}
+                              </span>
+                            </div>
+                            <LuPlus className="w-3 h-3 text-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                          </button>
+                        ))}
                       </div>
-                      {fields.map((field) => (
-                        <button
-                          key={field.path}
-                          type="button"
-                          onClick={() => handleInsertField(`blocks.${nodeId}.${field.path}`)}
-                          className="w-full flex items-center justify-between p-2 rounded hover:bg-primary/10 transition-colors group"
-                        >
-                          <div className="flex-1 text-left">
-                            <Typography variant="caption" className="text-foreground font-medium">
-                              {field.label}
-                            </Typography>
-                            <Typography variant="caption" className="text-muted-foreground text-xs block">
-                              {`{{blocks.${nodeId}.${field.path}}}`}
-                            </Typography>
-                          </div>
-                          <LuPlus className="w-3.5 h-3.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </button>
-                      ))}
                     </>
                   )}
                 </div>
@@ -319,6 +322,6 @@ export function TemplateFieldSelector({
           );
         })}
       </div>
-    </SimpleCard>
+    </div>
   );
 }

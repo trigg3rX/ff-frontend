@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef } from "react";
+import React, { useRef } from "react";
 import { Typography } from "@/components/ui/Typography";
 import { SimpleCard } from "@/components/ui/SimpleCard";
+import { FormInput } from "@/components/ui/FormInput";
 import { TemplateFieldSelector } from "@/blocks/configs/shared/TemplateFieldSelector";
 import type { AiTransformNodeData } from "@/types/node-data";
 
@@ -45,37 +46,47 @@ export function AiTransformNodeConfiguration({
 
   return (
     <>
-      {/* Prompts Card */}
-      <SimpleCard className="p-4 space-y-3">
-        <Typography variant="bodySmall" className="font-semibold text-foreground">
-          Prompts
-        </Typography>
+      <SimpleCard className="p-5 space-y-5">
+        {/* Header */}
+        <header className="space-y-1">
+          <Typography variant="bodySmall" className="font-semibold text-foreground">
+            Prompts
+          </Typography>
+          <Typography variant="caption" className="text-muted-foreground block">
+            Configure how the AI transforms your data
+          </Typography>
+        </header>
 
-        {/* Template Field Selector */}
-        <TemplateFieldSelector
-          currentNodeId={(nodeData.id as string) || ""}
-          onInsertField={(placeholder) => {
-            // Always insert into the user prompt template
-            insertIntoField("user", placeholder);
-          }}
-        />
+        {/* Insert fields from previous blocks – above */}
+        <section className="space-y-1.5">
+          <Typography variant="caption" className="text-muted-foreground font-medium">
+            Insert fields from previous blocks
+          </Typography>
+          <TemplateFieldSelector
+            currentNodeId={(nodeData.id as string) || ""}
+            onInsertField={(placeholder) => {
+              insertIntoField("user", placeholder);
+            }}
+          />
+        </section>
 
         {/* User Prompt Template */}
-        <div className="space-y-2">
-          <Typography variant="caption" className="text-muted-foreground">
-            User Prompt Template *
-          </Typography>
-          <textarea
+        <section className="space-y-2">
+          <FormInput
             ref={userPromptRef}
             id="user-prompt-template"
-            value={nodeData.userPromptTemplate || ""}
-            onChange={(e) => handleDataChange({ userPromptTemplate: e.target.value })}
-            className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none font-mono"
-            placeholder="Use the field selector above to insert dynamic values and think about the output you want..."
-            rows={5}
+            label="User Prompt Template"
             required
+            as="textarea"
+            textareaProps={{
+              value: nodeData.userPromptTemplate || "",
+              onChange: (e) => handleDataChange({ userPromptTemplate: e.target.value }),
+              placeholder: "Use the field selector above to insert dynamic values and think about the output you want...",
+              rows: 5,
+              className: "font-mono resize-y placeholder:text-xs",
+            }}
           />
-        </div>
+        </section>
       </SimpleCard>
     </>
   );
