@@ -68,6 +68,7 @@ interface ExecutionState {
 const UNISWAP_ROUTER_ADDRESSES: Record<SupportedChain, string> = {
     [SupportedChain.ARBITRUM]: '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45',
     [SupportedChain.ARBITRUM_SEPOLIA]: '0x101F443B4d1b059569D643917553c771E1b9663E',
+    [SupportedChain.ETHEREUM_SEPOLIA]: '0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E',
 };
 
 const ERC20_ABI = {
