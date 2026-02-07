@@ -65,6 +65,16 @@ const AI_MODEL_CONFIG_BY_MODEL: Record<string, AiModelConfig> = {
     temperature: 0.7,
     maxOutputTokens: 16384,
   },
+
+  // GPT-4o mini
+  "gpt-4o-mini": {
+    id: "openai-gpt-4o-mini",
+    provider: "openai",
+    displayName: "GPT-4o mini",
+    model: "gpt-4o-mini",
+    temperature: 0.7,
+    maxOutputTokens: 16384,
+  },
 };
 
 const DEFAULT_AI_MODEL_CONFIG: AiModelConfig = {

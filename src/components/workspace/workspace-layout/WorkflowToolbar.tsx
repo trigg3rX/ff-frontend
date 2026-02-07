@@ -2,12 +2,13 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { LuPlay, LuSave, LuShare2, LuMenu, LuPencil, LuLogIn, LuChevronLeft, LuLoaderCircle, LuCheck } from "react-icons/lu";
+import { LuPlay, LuSave, LuShare2, LuMenu, LuPencil, LuLogIn, LuChevronLeft, LuLoaderCircle, LuCheck, LuSparkles } from "react-icons/lu";
 import { usePrivy } from "@privy-io/react-auth";
 import { Button } from "@/components/ui/Button";
 import { UserMenu } from "@/components/user-menu/UserMenu";
 import { useWorkflow } from "@/context/WorkflowContext";
 import { WorkflowVersionHistory } from "@/components/workspace/WorkflowVersionHistory";
+import { WorkflowAssistant } from "@/components/workspace/WorkflowAssistant";
 import { formatDistanceToNow } from "date-fns";
 
 interface WorkflowToolbarProps {
@@ -38,6 +39,7 @@ export const WorkflowToolbar = React.memo(function WorkflowToolbar({
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(workflowName);
   const [showSavedIndicator, setShowSavedIndicator] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const canRun = nodes.length > 0;
@@ -200,6 +202,19 @@ export const WorkflowToolbar = React.memo(function WorkflowToolbar({
 
       {/* Right Actions */}
       <div className="flex items-center gap-2">
+        {/* AI Assistant */}
+        <Button
+          onClick={() => setAssistantOpen(true)}
+          title="Create workflow with AI"
+          className="bg-white/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30"
+        >
+          <LuSparkles className="w-4 h-4" aria-hidden="true" />
+          <span className="hidden md:inline text-sm font-medium">Create with AI</span>
+        </Button>
+        <WorkflowAssistant
+          open={assistantOpen}
+          onClose={() => setAssistantOpen(false)}
+        />
         {/* Save Button */}
         <Button
           onClick={handleSave}
@@ -250,8 +265,8 @@ export const WorkflowToolbar = React.memo(function WorkflowToolbar({
                 title="Login / Sign Up"
               >
                 <LuLogIn className="w-4 h-4" aria-hidden="true" />
-                <span className="hidden sm:inline text-sm font-medium">Login / Sign Up</span>
-                <span className="sm:hidden text-sm font-medium">Login</span>
+                <span className="hidden sm:inline text-sm font-medium">Sign In</span>
+                <span className="sm:hidden text-sm font-medium">Sign In</span>
               </Button>
             )}
           </>

@@ -125,6 +125,11 @@ export interface WorkflowContextType {
   loadWorkflow: (workflowId: string) => Promise<boolean>;
   resetWorkflow: () => void;
 
+  applyGeneratedWorkflow: (params: {
+    workflowName: string;
+    steps: { blockId: string }[];
+  }) => boolean;
+
   // Actions - Block operations
   handleBlockClick: (block: BlockDefinition) => void;
   handleBlockDragStart: () => void;
@@ -506,6 +511,92 @@ const WorkflowProviderInner: React.FC<{ children: React.ReactNode }> = ({
     setLastSaved(null);
     setSelectedNode(null);
   }, [setNodes, setEdges]);
+
+  // Apply AI-generated workflow (linear steps) to the canvas
+  const applyGeneratedWorkflow = useCallback(
+    (params: { workflowName: string; steps: { blockId: string }[] }): boolean => {
+      const { workflowName: name, steps } = params;
+      if (!steps.length) return false;
+
+      const startNode = initialNodes[0];
+      if (!startNode) return false;
+
+      // Tighter spacing so edges are short and nodes visibly connected; fitView will zoom to fit
+      const H_GAP = 180;
+      const startX = 60;
+      const startY = 120;
+
+      const newNodes: Node[] = [{ ...startNode, position: { x: startX, y: startY } }];
+      const newEdges: Edge[] = [];
+
+      steps.forEach((step, i) => {
+        // Map generic "ai-transform" to first available AI block
+        const blockId =
+          step.blockId === "ai-transform"
+            ? "ai-openai-chatgpt"
+            : step.blockId;
+        const blockDef = getBlockByIdFromRegistry(blockId);
+        if (!blockDef) return;
+
+        if (blockDef.nodeType === "wallet-node") {
+          const hasWallet = newNodes.some((n) => n.type === "wallet-node");
+          if (hasWallet) return;
+        }
+
+        const nodeId = `${step.blockId}-${Date.now()}-${i}`;
+        const position = {
+          x: startX + (i + 1) * H_GAP,
+          y: startY,
+        };
+
+        newNodes.push({
+          id: nodeId,
+          type: blockDef.nodeType || "base",
+          position,
+          data: {
+            ...blockDef.defaultData,
+            blockId: blockDef.id,
+            iconName: blockDef.iconName,
+          },
+        });
+
+        const sourceId = i === 0 ? START_NODE_ID : newNodes[i].id;
+        const targetId = nodeId;
+        newEdges.push({
+          id: `e-${sourceId}-${targetId}`,
+          source: sourceId,
+          target: targetId,
+          type: "smoothstep",
+          animated: true,
+          style: { stroke: "#ffffff", strokeWidth: 0.5 },
+        });
+      });
+
+      if (newNodes.length <= 1) return false;
+
+      pushUndo(nodes, edges);
+      setNodes(newNodes);
+      setEdges(newEdges);
+      setWorkflowName(name || "Untitled Workflow");
+      undoStackRef.current = [];
+      redoStackRef.current = [];
+      setUndoStackLength(0);
+      setRedoStackLength(0);
+      setSelectedNode(null);
+
+      // Zoom to fit after React has rendered the new nodes so edges are short and graph is visible
+      setTimeout(() => {
+        reactFlowInstanceRef.current?.fitView({ padding: 0.25, duration: 200 });
+        const zoom = reactFlowInstanceRef.current?.getZoom();
+        if (zoom !== undefined) {
+          setZoomLevel(Math.round(zoom * 100));
+        }
+      }, 100);
+
+      return true;
+    },
+    [nodes, edges, setNodes, setEdges, pushUndo]
+  );
 
   // Check if a node is protected from deletion
   const isProtectedNode = useCallback((nodeId: string): boolean => {
@@ -1037,6 +1128,7 @@ const WorkflowProviderInner: React.FC<{ children: React.ReactNode }> = ({
       handleRun,
       loadWorkflow,
       resetWorkflow,
+      applyGeneratedWorkflow,
       handleBlockClick,
       handleBlockDragStart,
       onDragOver,
@@ -1089,6 +1181,7 @@ const WorkflowProviderInner: React.FC<{ children: React.ReactNode }> = ({
       handleRun,
       loadWorkflow,
       resetWorkflow,
+      applyGeneratedWorkflow,
       handleBlockClick,
       handleBlockDragStart,
       onDragOver,
