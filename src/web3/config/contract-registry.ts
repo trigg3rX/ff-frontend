@@ -1,4 +1,4 @@
-import { Chains } from "./chain-registry";
+import { ChainId, Chains, getChain } from "./chain-registry";
 
 export interface ChainContracts {
     uniswapRouter: string;
@@ -15,7 +15,7 @@ export interface ChainContracts {
  * Stores contract addresses for each chain.
  * Keys are the Chain IDs (e.g. "ARBITRUM") from chain-registry.ts.
  */
-export const CONTRACT_REGISTRY: Record<string, ChainContracts> = {
+export const CONTRACT_REGISTRY: Partial<Record<ChainId, ChainContracts>> = {
     [Chains.ARBITRUM]: {
         uniswapRouter: "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
         universalRouter: "0xa51afafe0263b40edaef0df8781ea9aa03e381a3",
@@ -34,11 +34,11 @@ export const CONTRACT_REGISTRY: Record<string, ChainContracts> = {
     }
 };
 
-/**
- * Get a specific contract address for a chain.
- * Returns undefined if the chain or contract is not registered.
- */
+// Get a specific contract address for a chain.
 export const getContractAddress = (
-    chainId: string,
+    identifier: string | number | null | undefined,
     contract: keyof ChainContracts,
-): string | undefined => CONTRACT_REGISTRY[chainId]?.[contract];
+): string | undefined => {
+    const chainId = getChain(identifier)?.id as ChainId;
+    return chainId ? CONTRACT_REGISTRY[chainId]?.[contract] : undefined;
+};

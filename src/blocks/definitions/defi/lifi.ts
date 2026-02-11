@@ -1,5 +1,4 @@
 import type { BlockDefinition } from "../../types";
-import { Chains } from "@/web3/config/chain-registry";
 import {
     SwapProvider,
     SwapType,
@@ -19,7 +18,7 @@ export const lifiBlock: BlockDefinition = {
     nodeType: "lifi",
     backendType: "SWAP",
     sharedConfigComponent: "swap",
-    supportedChains: [Chains.ARBITRUM],
+    supportedChains: ["ARBITRUM"],
     configComponentProps: {
         requiresAuth: true,
         requiresForcedProvider: false,
@@ -30,8 +29,8 @@ export const lifiBlock: BlockDefinition = {
         status: "idle" as const,
         // Fixed provider for this block
         swapProvider: SwapProvider.LIFI,
-        swapChain: Chains.ARBITRUM,
-        swapToChain: Chains.ARBITRUM,
+        swapChain: "ARBITRUM",
+        swapToChain: "ARBITRUM",
         swapType: SwapType.EXACT_INPUT,
         // Source token
         sourceTokenAddress: "",

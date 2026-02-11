@@ -1,5 +1,4 @@
 import type { BlockDefinition } from "../../types";
-import { Chains } from "@/web3/config/chain-registry";
 import {
     SwapProvider,
     SwapType,
@@ -19,7 +18,7 @@ export const oneInchBlock: BlockDefinition = {
     nodeType: "oneinch",
     backendType: "SWAP",
     sharedConfigComponent: "swap",
-    supportedChains: [Chains.ARBITRUM],
+    supportedChains: ["ARBITRUM"],
     configComponentProps: {
         requiresAuth: true,
         requiresForcedProvider: false,
@@ -30,7 +29,7 @@ export const oneInchBlock: BlockDefinition = {
         status: "idle" as const,
         // Fixed provider for this block
         swapProvider: SwapProvider.ONEINCH,
-        swapChain: Chains.ARBITRUM,
+        swapChain: "ARBITRUM",
         swapType: SwapType.EXACT_INPUT,
         // Source token
         sourceTokenAddress: "",

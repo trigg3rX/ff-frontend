@@ -22,9 +22,8 @@ import {
     getChainlinkFeedsForChain,
     isValidEthereumAddress,
     isValidPythFeedId,
-    CHAIN_LABELS,
 } from "@/types/oracle";
-import { Chains } from "@/web3/config/chain-registry";
+import { getChain } from '@/web3/config/chain-registry';
 import { cn } from "@/lib/utils";
 
 interface OracleNodeConfigurationProps {
@@ -44,7 +43,7 @@ function OracleNodeConfigurationInner({
 
     // Extract oracle data
     const oracleProvider = (nodeData.oracleProvider as OracleProvider) || OracleProvider.CHAINLINK;
-    const oracleChain = (nodeData.oracleChain as string) || Chains.ARBITRUM_SEPOLIA;
+    const oracleChain = (nodeData.oracleChain as string) || "ARBITRUM_SEPOLIA";
     const aggregatorAddress = (nodeData.aggregatorAddress as string) || "";
     const priceFeedId = (nodeData.priceFeedId as string) || "";
     const selectedPriceFeed = (nodeData.selectedPriceFeed as string) || "";
@@ -144,13 +143,13 @@ function OracleNodeConfigurationInner({
                     <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-zinc-800 border border-white/10 text-[10px] font-bold text-white/40 group-hover:text-white/60 transition-colors">
                         1
                     </div>
-                    <Typography variant="bodySmall" className="font-bold text-foreground">
-                        Select Network
+                    <Typography variant="caption" className="text-muted-foreground">
+                        Blockchain Network
                     </Typography>
                 </div>
 
                 <div className="grid grid-cols-1 gap-2">
-                    {[Chains.ARBITRUM, Chains.ARBITRUM_SEPOLIA].map((chain) => {
+                    {["ARBITRUM", "ARBITRUM_SEPOLIA"].map((chain) => {
                         const isSelected = oracleChain === chain;
                         return (
                             <button
@@ -171,7 +170,7 @@ function OracleNodeConfigurationInner({
                                         <LuNetwork className="w-4 h-4" />
                                     </div>
                                     <span className="text-sm font-semibold tracking-tight">
-                                        {CHAIN_LABELS[chain]}
+                                        {getChain(chain)?.name || chain}
                                     </span>
                                 </div>
                                 {isSelected && <LuCircleCheck className="w-4 h-4" />}

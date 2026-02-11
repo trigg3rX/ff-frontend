@@ -24,7 +24,7 @@ import { ethers } from "ethers";
 import { useSafeWalletContext } from "@/context/SafeWalletContext";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
 import Safe from "@safe-global/protocol-kit";
-import { CHAIN_IDS } from "@/web3/chains";
+import { getChain } from "@/web3/config/chain-registry";
 import {
     SwapProvider,
     SwapType,
@@ -33,9 +33,7 @@ import {
     getTokensForChain,
     allowsCustomTokens,
     CUSTOM_TOKEN_OPTION,
-    CHAIN_LABELS,
 } from "@/types/swap";
-import { Chains } from "@/web3/config/chain-registry";
 import { getContractAddress } from "@/web3/config/contract-registry";
 import { API_CONFIG, buildApiUrl } from "@/config/api";
 
@@ -67,7 +65,7 @@ interface ExecutionState {
 }
 
 // Chains available for LiFi (same-chain or cross-chain Arbitrum ↔ Base)
-const LIFI_CHAINS: string[] = [Chains.ARBITRUM];
+const LIFI_CHAINS: string[] = ["ARBITRUM"];
 
 
 const ERC20_ABI = {
@@ -143,18 +141,18 @@ export function SwapNodeConfiguration({
         (nodeData.swapProvider as SwapProvider) ||
         SwapProvider.UNISWAP;
 
-    // Convert chainId to chain string (Base 8453 used for LiFi block only)
-    const getChainFromChainId = useCallback((cid: number | null): string => {
-        if (cid === CHAIN_IDS.ARBITRUM_SEPOLIA) return Chains.ARBITRUM_SEPOLIA;
-        return Chains.ARBITRUM;
+    // Convert chainId to chain string
+    const getChainFromChainId = useCallback((cid: number | null | string): string => {
+        const id = typeof cid === 'string' ? parseInt(cid) : cid;
+        return getChain(id)?.id || "ARBITRUM";
     }, []);
 
     const isLiFi = swapProvider === SwapProvider.LIFI;
 
     // For LiFi: from/to chain from node config (user selects in UI). For other providers: chain from wallet.
     const swapChain: string = isLiFi
-        ? ((nodeData.swapChain as string) || Chains.ARBITRUM)
-        : (chainId ? getChainFromChainId(chainId) : Chains.ARBITRUM);
+        ? ((nodeData.swapChain as string) || "ARBITRUM")
+        : (chainId ? getChainFromChainId(chainId) : "ARBITRUM");
 
     const swapToChain: string | undefined = isLiFi
         ? (nodeData.swapToChain as string | undefined)
@@ -1014,7 +1012,7 @@ export function SwapNodeConfiguration({
                                         hasQuote: false,
                                     });
                                 }}
-                                options={LIFI_CHAINS.map((c) => ({ value: c, label: CHAIN_LABELS[c] }))}
+                                options={LIFI_CHAINS.map((c) => ({ value: c, label: getChain(c)?.name || c }))}
                                 placeholder="From"
                             />
                         </div>
@@ -1037,7 +1035,7 @@ export function SwapNodeConfiguration({
                                 }}
                                 options={[
                                     { value: "__SAME__", label: "Same as from" },
-                                    ...LIFI_CHAINS.map((c) => ({ value: c, label: CHAIN_LABELS[c] })),
+                                    ...LIFI_CHAINS.map((c) => ({ value: c, label: getChain(c)?.name || c })),
                                 ]}
                                 placeholder="To"
                             />
@@ -1053,13 +1051,13 @@ export function SwapNodeConfiguration({
                         {isLiFi ? "1. Select Tokens" : "1. Select Tokens"}
                     </Typography>
                     {!isLiFi && (
-                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full shrink-0 ${swapChain === Chains.ARBITRUM_SEPOLIA ? "bg-amber-500/15 text-amber-400" : "bg-emerald-500/15 text-emerald-400"}`}>
-                            {swapChain === Chains.ARBITRUM_SEPOLIA ? "Testnet" : "Mainnet"}
+                        <span className={`text-xs font-medium px-2.5 py-1 rounded-full shrink-0 ${swapChain === "ARBITRUM_SEPOLIA" ? "bg-amber-500/15 text-amber-400" : "bg-emerald-500/15 text-emerald-400"}`}>
+                            {swapChain === "ARBITRUM_SEPOLIA" ? "Testnet" : "Mainnet"}
                         </span>
                     )}
                     {isLiFi && (
                         <span className="text-xs font-medium px-2.5 py-1 rounded-full shrink-0 bg-white/10 text-foreground">
-                            {CHAIN_LABELS[swapChain]} → {swapToChain ? CHAIN_LABELS[swapToChain] : CHAIN_LABELS[swapChain]}
+                            {getChain(swapChain)?.name || swapChain} → {swapToChain ? (getChain(swapToChain)?.name || swapToChain) : (getChain(swapChain)?.name || swapChain)}
                         </span>
                     )}
                 </div>
@@ -1261,7 +1259,7 @@ export function SwapNodeConfiguration({
                             Execute Swap (Test)
                         </Typography>
                         <Typography variant="bodySmall" className="text-muted-foreground">
-                            Run swap on {swapChain === Chains.ARBITRUM_SEPOLIA ? "Sepolia" : "Mainnet"} with your embedded wallet
+                            Run swap on {swapChain === "ARBITRUM_SEPOLIA" ? "Sepolia" : "Mainnet"} with your embedded wallet
                         </Typography>
                     </div>
 
@@ -1283,7 +1281,7 @@ export function SwapNodeConfiguration({
                             ) : (
                                 <>
                                     <LuPlay className="w-4 h-4" />
-                                    Execute Swap on {swapChain === Chains.ARBITRUM_SEPOLIA ? "Sepolia" : "Mainnet"}
+                                    Execute Swap on {swapChain === "ARBITRUM_SEPOLIA" ? "Sepolia" : "Mainnet"}
                                 </>
                             )}
                         </Button>
@@ -1300,7 +1298,7 @@ export function SwapNodeConfiguration({
                                             {executionState.approvalTxHash}
                                         </Typography>
                                         <a
-                                            href={`https://${swapChain === Chains.ARBITRUM_SEPOLIA ? "sepolia." : ""}arbiscan.io/tx/${executionState.approvalTxHash}`}
+                                            href={`https://${swapChain === "ARBITRUM_SEPOLIA" ? "sepolia." : ""}arbiscan.io/tx/${executionState.approvalTxHash}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-amber-500 hover:text-amber-400 flex items-center gap-1 shrink-0"
@@ -1344,7 +1342,7 @@ export function SwapNodeConfiguration({
                                         {executionState.txHash}
                                     </Typography>
                                     <a
-                                        href={`https://${swapChain === Chains.ARBITRUM_SEPOLIA ? "sepolia." : ""}arbiscan.io/tx/${executionState.txHash}`}
+                                        href={`https://${swapChain === "ARBITRUM_SEPOLIA" ? "sepolia." : ""}arbiscan.io/tx/${executionState.txHash}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-amber-500 hover:text-amber-400 flex items-center gap-1"

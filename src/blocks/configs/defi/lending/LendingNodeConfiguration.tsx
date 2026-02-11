@@ -32,8 +32,7 @@ import {
     INTEREST_RATE_MODE_LABELS,
     getLendingTokensForChain,
 } from "@/types/lending";
-import { Chains } from "@/web3/config/chain-registry";
-import { CHAIN_IDS } from "@/web3/chains";
+import { getChain } from '@/web3/config/chain-registry';
 import { API_CONFIG, buildApiUrl } from "@/config/api";
 
 interface LendingNodeConfigurationProps {
@@ -97,7 +96,8 @@ function LendingNodeConfigurationInner({
 
     const { selection } = useSafeWalletContext();
     const selectedSafe = selection.selectedSafe;
-    const { chainId: currentChainId } = useWallets().wallets.find(w => w.walletClientType === "privy") || { chainId: null };
+    const walletChainId = embeddedWallet?.chainId || null;
+    const currentInternalId = getChain(walletChainId)?.id;
 
     // Local state
     const [quoteState, setQuoteState] = useState<QuoteState>({
@@ -125,7 +125,7 @@ function LendingNodeConfigurationInner({
 
     // Get available tokens for the provider and chain
     const availableTokens = useMemo(() => {
-        const chain = (nodeData.lendingChain as string) || Chains.ARBITRUM;
+        const chain = (nodeData.lendingChain as string) || "ARBITRUM";
         return getLendingTokensForChain(lendingProvider, chain);
     }, [lendingProvider, nodeData.lendingChain]);
 
@@ -147,9 +147,9 @@ function LendingNodeConfigurationInner({
 
         // Set chain automatically based on current network if not set
         const targetChain =
-            Number(currentChainId) === CHAIN_IDS.ARBITRUM_SEPOLIA
-                ? Chains.ARBITRUM_SEPOLIA
-                : Chains.ARBITRUM;
+            currentInternalId === "ARBITRUM_SEPOLIA"
+                ? "ARBITRUM_SEPOLIA"
+                : "ARBITRUM";
         if (nodeData.lendingChain !== targetChain) {
             updates.lendingChain = targetChain;
         }
@@ -223,7 +223,7 @@ function LendingNodeConfigurationInner({
                     : undefined,
             };
 
-            const chain = (nodeData.lendingChain as string) || Chains.ARBITRUM;
+            const chain = (nodeData.lendingChain as string) || "ARBITRUM";
             const url = `${buildApiUrl(API_CONFIG.ENDPOINTS.LENDING.QUOTE)}/${lendingProvider}/${chain}`;
 
             const response = await fetch(url, {
@@ -294,7 +294,7 @@ function LendingNodeConfigurationInner({
         setPositionState({ loading: true, error: null, data: null });
 
         try {
-            const chain = (nodeData.lendingChain as string) || Chains.ARBITRUM;
+            const chain = (nodeData.lendingChain as string) || "ARBITRUM";
             const url = `${buildApiUrl(API_CONFIG.ENDPOINTS.LENDING.POSITION)}/${lendingProvider}/${chain}/${effectiveWalletAddress}?asset=${assetAddress}`;
 
             const response = await fetch(url);

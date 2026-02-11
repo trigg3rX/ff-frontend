@@ -8,7 +8,7 @@
 
 import { api } from "@/lib/api-client";
 import { API_CONFIG } from "@/config/api";
-import { CHAIN_LABELS } from "@/web3/config/chain-registry";
+import { getChain } from "@/web3/config/chain-registry";
 
 export type OracleProvider = "CHAINLINK" | "PYTH";
 export type FeedCategory = "crypto" | "forex" | "commodities";
@@ -111,7 +111,7 @@ export function groupFeedsByCategory(
  * Uses centralized CHAIN_LABELS from chain-registry.
  */
 export function getChainLabel(chain: string): string {
-  return CHAIN_LABELS[chain] ?? chain;
+  return getChain(chain)?.name ?? chain;
 }
 
 /**

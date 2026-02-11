@@ -35,7 +35,7 @@ export function ClaimEnsSubdomainModal({
   const [label, setLabel] = useState("");
   const [durationOption, setDurationOption] = useState<(typeof DURATION_OPTIONS)[number]>(DURATION_OPTIONS[0]);
   const [paymentToken, setPaymentToken] = useState<"eth" | "usdc">("eth");
-  const [ensChainId, setEnsChainId] = useState<number>(getConfiguredEnsChains()[0]?.chainId ?? 11155111);
+  const [ensChainId, setEnsChainId] = useState<string | number>(getConfiguredEnsChains()[0]?.chainId ?? 1);
   const [priceWei, setPriceWei] = useState<bigint | null>(null);
   const [priceLoading, setPriceLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -88,7 +88,7 @@ export function ClaimEnsSubdomainModal({
     setError(null);
     try {
       const result = await registerSubdomain({
-        chainId: ensChainId,
+        identifier: ensChainId,
         label: label.trim().toLowerCase(),
         durationSeconds,
         paymentToken,
@@ -177,8 +177,8 @@ export function ClaimEnsSubdomainModal({
                   type="button"
                   onClick={() => setDurationOption(opt)}
                   className={`rounded-md border px-3 py-2 text-sm ${durationOption.seconds === opt.seconds
-                      ? "border-primary bg-primary/20 text-white"
-                      : "border-white/20 text-white/70 hover:border-white/40"
+                    ? "border-primary bg-primary/20 text-white"
+                    : "border-white/20 text-white/70 hover:border-white/40"
                     }`}
                 >
                   {opt.label}
@@ -194,8 +194,8 @@ export function ClaimEnsSubdomainModal({
                 type="button"
                 onClick={() => setPaymentToken("eth")}
                 className={`rounded-md border px-3 py-2 text-sm ${paymentToken === "eth"
-                    ? "border-primary bg-primary/20 text-white"
-                    : "border-white/20 text-white/70 hover:border-white/40"
+                  ? "border-primary bg-primary/20 text-white"
+                  : "border-white/20 text-white/70 hover:border-white/40"
                   }`}
               >
                 ETH
@@ -204,8 +204,8 @@ export function ClaimEnsSubdomainModal({
                 type="button"
                 onClick={() => setPaymentToken("usdc")}
                 className={`rounded-md border px-3 py-2 text-sm ${paymentToken === "usdc"
-                    ? "border-primary bg-primary/20 text-white"
-                    : "border-white/20 text-white/70 hover:border-white/40"
+                  ? "border-primary bg-primary/20 text-white"
+                  : "border-white/20 text-white/70 hover:border-white/40"
                   }`}
               >
                 USDC

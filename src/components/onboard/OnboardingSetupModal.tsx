@@ -9,7 +9,7 @@ import {
 } from "@/context/OnboardingContext";
 import { usePrivy } from "@privy-io/react-auth";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
-import { CHAIN_IDS } from "@/web3/chains";
+import { getChain } from "@/web3/config/chain-registry";
 import { TbFidgetSpinner } from "react-icons/tb";
 import {
     FaCheckCircle,
@@ -188,7 +188,7 @@ export const OnboardingSetupModal: React.FC = () => {
             needsOnboarding &&
             allIdle &&
             !isOnboarding &&
-            chainId === CHAIN_IDS.ARBITRUM_SEPOLIA &&
+            getChain(chainId)?.id === "ARBITRUM_SEPOLIA" &&
             !hasAutoStartedRef.current
         ) {
             hasAutoStartedRef.current = true;
@@ -259,7 +259,7 @@ export const OnboardingSetupModal: React.FC = () => {
                                 moduleVerify: "idle",
                             }}
                             isSigning={currentSigningChain === String(chain.id)}
-                            onRetry={() => retryChain(chain.chainId)}
+                            onRetry={() => retryChain(chain.id)}
                         />
                     ))}
                 </div>

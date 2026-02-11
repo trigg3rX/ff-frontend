@@ -22,7 +22,6 @@ import { generateIconRegistry } from "@/blocks/registry";
 import type { BlockDefinition } from "@/blocks/types";
 import { BlockProvider, useBlock } from "@/blocks/context";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
-// import { isTestnet, isMainnet, CHAIN_IDS } from "@/web3/chains";
 import { SaveWorkflowModal } from "@/components/workspace/SaveWorkflowModal";
 import { useCanvasDimensions } from "@/hooks/useCanvasDimensions";
 import { useUnsavedChanges } from "@/hooks/useWorkflowState";

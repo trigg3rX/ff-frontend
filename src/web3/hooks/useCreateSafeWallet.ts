@@ -1,12 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
 import { ethers } from "ethers";
-import {
-  CHAIN_IDS,
-  getChainName,
-  getSafeModuleAddress,
-  isSupportedChain,
-} from "@/web3/chains";
+import { getContractAddress } from "@/web3/config/contract-registry";
+import { getChain } from "@/web3/config/chain-registry";
 import Safe from "@safe-global/protocol-kit";
 import type { SafeTransaction } from "@safe-global/safe-core-sdk-types";
 import type { CreateSafeResult, SignResult, SubmitResult } from "../types/safe";
@@ -63,11 +59,11 @@ export const useCreateSafeWallet = () => {
       }
 
       // Validate chain ID
-      if (!isSupportedChain(effectiveChainId)) {
+      if (!getChain(effectiveChainId)) {
         return {
           success: false,
           safeAddress: null,
-          error: `Unsupported chain. Please switch to Arbitrum Sepolia (${CHAIN_IDS.ARBITRUM_SEPOLIA}) or Arbitrum Mainnet (${CHAIN_IDS.ARBITRUM_MAINNET}). Current chain: ${effectiveChainId}`,
+          error: `Unsupported chain. Please switch to Arbitrum Sepolia (${getChain("ARBITRUM_SEPOLIA")?.chainId}) or Arbitrum Mainnet (${getChain("ARBITRUM")?.chainId}). Current chain: ${effectiveChainId}`,
         };
       }
 
@@ -84,7 +80,7 @@ export const useCreateSafeWallet = () => {
             return {
               success: false,
               safeAddress: null,
-              error: `Wallet chain mismatch. Expected ${getChainName(chainId)} but wallet is on chain ${actualChainIdNum}. Please switch networks.`,
+              error: `Wallet chain mismatch. Expected ${getChain(chainId)?.name ?? `Chain ${chainId}`} but wallet is on chain ${actualChainIdNum}. Please switch networks.`,
             };
           }
         } catch {
@@ -206,10 +202,10 @@ export const useCreateSafeWallet = () => {
       }
 
       // Validate chain ID
-      if (!isSupportedChain(effectiveChainId)) {
+      if (!getChain(effectiveChainId)) {
         return {
           success: false,
-          error: `Unsupported chain. Please switch to Arbitrum Sepolia (${CHAIN_IDS.ARBITRUM_SEPOLIA}) or Arbitrum Mainnet (${CHAIN_IDS.ARBITRUM_MAINNET}). Current chain: ${effectiveChainId}`,
+          error: `Unsupported chain. Please switch to Arbitrum Sepolia (${getChain("ARBITRUM_SEPOLIA")?.chainId}) or Arbitrum Mainnet (${getChain("ARBITRUM")?.chainId}). Current chain: ${effectiveChainId}`,
         };
       }
 
@@ -221,13 +217,11 @@ export const useCreateSafeWallet = () => {
         };
       }
 
-      const moduleAddress = getSafeModuleAddress(effectiveChainId);
+      const moduleAddress = getContractAddress(effectiveChainId, "safeModule");
       if (!moduleAddress) {
         return {
           success: false,
-          error: `Safe Module address not configured for ${getChainName(
-            effectiveChainId,
-          )}. Please check your environment variables.`,
+          error: `Safe Module address not configured for ${getChain(effectiveChainId)?.name ?? `Chain ${effectiveChainId}`}. Please check your environment variables.`,
         };
       }
 
@@ -376,20 +370,18 @@ export const useCreateSafeWallet = () => {
       }
 
       // Validate chain ID
-      if (!isSupportedChain(chainId)) {
+      if (!getChain(chainId)) {
         return {
           success: false,
-          error: `Unsupported chain. Please switch to Arbitrum Sepolia (${CHAIN_IDS.ARBITRUM_SEPOLIA}) or Arbitrum Mainnet (${CHAIN_IDS.ARBITRUM_MAINNET}). Current chain: ${chainId}`,
+          error: `Unsupported chain. Please switch to Arbitrum Sepolia (${getChain("ARBITRUM_SEPOLIA")?.chainId}) or Arbitrum Mainnet (${getChain("ARBITRUM")?.chainId}). Current chain: ${chainId}`,
         };
       }
 
-      const moduleAddress = getSafeModuleAddress(chainId);
+      const moduleAddress = getContractAddress(chainId, "safeModule");
       if (!moduleAddress) {
         return {
           success: false,
-          error: `Safe Module address not configured for ${getChainName(
-            chainId,
-          )}. Please check your environment variables.`,
+          error: `Safe Module address not configured for ${getChain(chainId)?.name ?? `Chain ${chainId}`}. Please check your environment variables.`,
         };
       }
 

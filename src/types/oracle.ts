@@ -9,8 +9,7 @@
  * from chain-registry (e.g. "ARBITRUM", "ARBITRUM_SEPOLIA").
  */
 
-// Re-export chain labels from centralized registry
-export { CHAIN_LABELS } from "@/web3/config/chain-registry";
+
 
 export enum OracleProvider {
     CHAINLINK = "CHAINLINK",

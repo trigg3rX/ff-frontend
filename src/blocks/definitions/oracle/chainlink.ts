@@ -1,5 +1,4 @@
 import type { BlockDefinition } from "../../types";
-import { Chains } from "@/web3/config/chain-registry";
 import { OracleProvider } from "@/types/oracle";
 
 /**
@@ -16,7 +15,7 @@ export const chainlinkBlock: BlockDefinition = {
     nodeType: "chainlink",
     backendType: "PRICE_ORACLE",
     sharedConfigComponent: "oracle",
-    supportedChains: [Chains.ARBITRUM, Chains.ARBITRUM_SEPOLIA],
+    supportedChains: ["ARBITRUM", "ARBITRUM_SEPOLIA"],
     configComponentProps: {
         requiresAuth: true,
     },
@@ -26,7 +25,7 @@ export const chainlinkBlock: BlockDefinition = {
         status: "idle" as const,
         // Oracle configuration
         oracleProvider: OracleProvider.CHAINLINK,
-        oracleChain: Chains.ARBITRUM_SEPOLIA,
+        oracleChain: "ARBITRUM_SEPOLIA",
         // Chainlink specific
         aggregatorAddress: "",
         selectedPriceFeed: "",

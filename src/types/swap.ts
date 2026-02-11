@@ -9,7 +9,6 @@
 
 // ─── Re-export chain-related items from centralized registries ───────
 // These re-exports maintain backward compatibility for existing imports.
-export { CHAIN_LABELS } from "@/web3/config/chain-registry";
 export { getSwapTokensForChain as getTokensForChain } from "@/web3/config/token-registry";
 
 // Supported Swap Providers

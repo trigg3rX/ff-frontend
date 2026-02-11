@@ -8,8 +8,8 @@
  */
 
 // Re-export chain labels and lending token helper from registries
-export { CHAIN_LABELS } from "@/web3/config/chain-registry";
-export { getLendingTokens } from "@/web3/config/token-registry";
+import { getLendingTokens } from "@/web3/config/token-registry";
+export { getLendingTokens };
 
 // Supported Lending Providers
 export enum LendingProvider {
@@ -147,8 +147,7 @@ export interface LendingAccountData {
  * @returns Array of LendingTokenInfo
  */
 export function getLendingTokensForChain(provider: LendingProvider, chain: string): LendingTokenInfo[] {
-    const { getLendingTokens: getTokens } = require("@/web3/config/token-registry");
-    return getTokens(provider, chain);
+    return getLendingTokens(provider, chain);
 }
 
 /**

@@ -1,5 +1,4 @@
 import type { BlockDefinition } from "../../types";
-import { Chains } from "@/web3/config/chain-registry";
 import {
     LendingProvider,
     LendingOperation,
@@ -20,7 +19,7 @@ export const compoundBlock: BlockDefinition = {
     nodeType: "compound",
     backendType: "LENDING",
     sharedConfigComponent: "lending",
-    supportedChains: [Chains.ARBITRUM],
+    supportedChains: ["ARBITRUM"],
     configComponentProps: {
         requiresAuth: true,
     },
@@ -30,7 +29,7 @@ export const compoundBlock: BlockDefinition = {
         status: "idle" as const,
         // Fixed provider for this block
         lendingProvider: LendingProvider.COMPOUND,
-        lendingChain: Chains.ARBITRUM,
+        lendingChain: "ARBITRUM",
         lendingOperation: LendingOperation.SUPPLY,
         // Asset configuration
         assetAddress: "",

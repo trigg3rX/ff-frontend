@@ -99,7 +99,7 @@ export interface BlockDefinition {
   /**
    * Chains this block supports.
    * If undefined or empty, the block is chain-agnostic (e.g. Telegram, Slack).
-   * Values must match chain IDs from CHAIN_REGISTRY (e.g. "ARBITRUM", "BASE").
+   * Values must match chain IDs from getAllChains() (e.g. "ARBITRUM", "BASE").
    * The UI will auto-filter chain dropdowns based on this field.
    */
   supportedChains?: string[];

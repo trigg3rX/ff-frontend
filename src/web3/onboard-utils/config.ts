@@ -4,8 +4,7 @@
  */
 
 import { API_CONFIG, buildApiUrl } from "@/config/api";
-import type { ChainDefinition } from "@/web3/chains";
-import { getSelectableChains } from "@/web3/chains";
+import { getAllChains, ChainInfo } from "@/web3/config/chain-registry";
 
 /**
  * Runtime configuration from backend
@@ -43,15 +42,15 @@ export async function fetchBackendRuntimeConfig(): Promise<BackendRuntimeConfig>
   return data.data;
 }
 
-export function getOnboardingChains(): ChainDefinition[] {
-  return getSelectableChains().filter((c) => c.isTestnet);
+export function getOnboardingChains(): ChainInfo[] {
+  return getAllChains().filter((c) => c.isTestnet);
 }
 
 /**
  * Fetch backend config and return onboarding chains
  */
 export async function validateAndGetOnboardingChains(): Promise<{
-  chains: ChainDefinition[];
+  chains: ChainInfo[];
   backendConfig: BackendRuntimeConfig;
 }> {
   const backendConfig = await fetchBackendRuntimeConfig();

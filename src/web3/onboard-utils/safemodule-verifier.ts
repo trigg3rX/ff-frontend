@@ -2,12 +2,12 @@
 
 import { ethers } from "ethers";
 import SafeArtifact from "@/web3/artifacts/Safe.json";
-import { getSafeModuleAddress } from "@/web3/chains";
+import { getContractAddress } from "@/web3/config/contract-registry";
 
 /**
  * Verify that module is enabled for a Safe (with retry logic)
  * @param safeAddress - Safe wallet address
- * @param chainId - Chain ID
+ * @param identifier - Chain ID (number) or Internal ID (string)
  * @param provider - Ethereum provider
  * @param maxRetries - Maximum number of retries (default 3)
  * @param delayMs - Delay between retries in ms (default 2000)
@@ -15,15 +15,15 @@ import { getSafeModuleAddress } from "@/web3/chains";
  */
 export async function verifyModuleEnabled(
   safeAddress: string,
-  chainId: number,
+  identifier: string | number,
   provider: ethers.Eip1193Provider,
   maxRetries: number = 3,
   delayMs: number = 2000,
 ): Promise<boolean> {
-  const moduleAddress = getSafeModuleAddress(chainId);
+  const moduleAddress = getContractAddress(identifier, "safeModule");
 
   if (!moduleAddress) {
-    throw new Error(`Module address not configured for chain ${chainId}`);
+    throw new Error(`Module address not configured for chain ${identifier}`);
   }
 
   const ethersProvider = new ethers.BrowserProvider(provider);

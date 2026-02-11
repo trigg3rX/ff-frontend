@@ -13,7 +13,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { usePrivyWallet } from "@/hooks/usePrivyWallet";
 import { useCreateSafeWallet } from "@/web3/hooks/useCreateSafeWallet";
 import { API_CONFIG } from "@/config/api";
-import { ChainDefinition, isTestnet, isMainnet } from "@/web3/chains";
+import { ChainInfo, getChain } from "@/web3/config/chain-registry";
 
 import {
     validateAndGetOnboardingChains,
@@ -34,7 +34,7 @@ export interface ChainProgress {
     safeAddress?: string;
 }
 
-export type ChainConfig = ChainDefinition;
+export type ChainConfig = ChainInfo;
 
 export interface UserData {
     id: string;
@@ -64,7 +64,7 @@ export interface OnboardingContextType {
     // Actions
     setWalletChoiceCompleted: (value: boolean) => void;
     startOnboarding: () => Promise<void>;
-    retryChain: (chainId: number) => Promise<void>;
+    retryChain: (identifier: string | number) => Promise<void>;
     dismissOnboarding: () => void;
 }
 
@@ -411,10 +411,11 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({
 
                 // Existing user – check which chains still need setup
                 const chainsNeedingSetup = chainsToSetup.filter((chain) => {
-                    if (isTestnet(chain.chainId)) {
+                    const c = getChain(chain.chainId);
+                    if (c?.isTestnet) {
                         return !user?.safe_wallet_address_testnet;
                     }
-                    if (isMainnet(chain.chainId)) {
+                    if (c && !c.isTestnet) {
                         return !user?.safe_wallet_address_mainnet;
                     }
                     return true;
@@ -427,9 +428,10 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({
                         const updated = { ...prev };
                         for (const chain of chainsToSetup) {
                             let hasWallet = false;
-                            if (isTestnet(chain.chainId)) {
+                            const c = getChain(chain.chainId);
+                            if (c?.isTestnet) {
                                 hasWallet = !!user?.safe_wallet_address_testnet;
-                            } else if (isMainnet(chain.chainId)) {
+                            } else if (c && !c.isTestnet) {
                                 hasWallet = !!user?.safe_wallet_address_mainnet;
                             }
 
@@ -505,10 +507,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsOnboarding(false);
     }, [isOnboarding, chainsToSetup, progress, processChain, fetchUserData]);
 
-    // Retry a specific chain
     const retryChain = useCallback(
-        async (chainId: number) => {
-            const chain = chainsToSetup.find((c) => c.chainId === chainId);
+        async (identifier: string | number) => {
+            const chain = chainsToSetup.find((c) => c.id === identifier || c.chainId === identifier);
             if (!chain) return;
 
             const success = await processChain(chain);
@@ -519,7 +520,8 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({
 
                 // Check if all chains are now complete
                 const allComplete = chainsToSetup.every((c) => {
-                    if (c.chainId === chainId) return true;
+                    const identifierMatch = c.id === identifier || c.chainId === identifier;
+                    if (identifierMatch) return true;
                     // For other chains, check progress by mapping their string ID from the chain object
                     const p = progress[c.id];
                     return p?.moduleVerify === "success";

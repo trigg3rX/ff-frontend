@@ -32,11 +32,12 @@ const ensChainConfigs: Partial<Record<EnsChainId, EnsChainConfig>> = {
 
 };
 
-export function getEnsConfig(chainId: number): EnsChainConfig | null {
-  if (chainId !== ENS_CHAIN_IDS.ETHEREUM_MAINNET) {
+export function getEnsConfig(identifier: string | number): EnsChainConfig | null {
+  const numericId = typeof identifier === "string" ? parseInt(identifier) : identifier;
+  if (numericId !== ENS_CHAIN_IDS.ETHEREUM_MAINNET) {
     return null;
   }
-  const cfg = ensChainConfigs[chainId as EnsChainId];
+  const cfg = ensChainConfigs[numericId as EnsChainId];
   if (!cfg?.registryAddress || !cfg?.pricerAddress) return null;
   return cfg;
 }

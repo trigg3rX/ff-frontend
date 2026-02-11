@@ -39,13 +39,13 @@ export interface UseEnsSubdomainResult {
   error: string | null;
   listSubdomains: (accessToken: string) => Promise<void>;
   getPrice: (
-    chainId: number,
+    identifier: string | number,
     label: string,
     durationSeconds: number,
     paymentToken: "eth" | "usdc"
   ) => Promise<bigint>;
   registerSubdomain: (params: {
-    chainId: number;
+    identifier: string | number;
     label: string;
     durationSeconds: number;
     paymentToken: "eth" | "usdc";
@@ -88,16 +88,17 @@ export function useEnsSubdomain(): UseEnsSubdomainResult {
 
   const getPrice = useCallback(
     async (
-      chainId: number,
+      identifier: string | number,
       label: string,
       durationSeconds: number,
       paymentToken: "eth" | "usdc"
     ): Promise<bigint> => {
-      const cfg = getEnsConfig(chainId);
+      const cfg = getEnsConfig(identifier);
       if (!cfg) return BigInt(0);
 
       const transport = http();
-      const chain = chainId === ENS_CHAIN_IDS.ETHEREUM_MAINNET ? mainnet : undefined;
+      const numericId = typeof identifier === "string" ? parseInt(identifier) : identifier;
+      const chain = numericId === ENS_CHAIN_IDS.ETHEREUM_MAINNET ? mainnet : undefined;
       if (!chain) return BigInt(0);
       const client = createPublicClient({
         chain,
@@ -122,7 +123,7 @@ export function useEnsSubdomain(): UseEnsSubdomainResult {
 
   const registerSubdomain = useCallback(
     async (params: {
-      chainId: number;
+      identifier: string | number;
       label: string;
       durationSeconds: number;
       paymentToken: "eth" | "usdc";
@@ -134,13 +135,14 @@ export function useEnsSubdomain(): UseEnsSubdomainResult {
       error?: string;
       remaining_sponsored_txs?: number;
     }> => {
-      const { chainId, label, durationSeconds, paymentToken, ownerAddress, accessToken, walletProvider } = params;
-      const cfg = getEnsConfig(chainId);
+      const { identifier, label, durationSeconds, paymentToken, ownerAddress, accessToken, walletProvider } = params;
+      const cfg = getEnsConfig(identifier);
       if (!cfg) {
         return { success: false, error: "ENS not configured for this chain" };
       }
 
-      const chain = chainId === ENS_CHAIN_IDS.ETHEREUM_MAINNET ? mainnet : undefined;
+      const numericId = typeof identifier === "string" ? parseInt(identifier) : identifier;
+      const chain = numericId === ENS_CHAIN_IDS.ETHEREUM_MAINNET ? mainnet : undefined;
       if (!chain) {
         return { success: false, error: "Unsupported ENS chain. Use Ethereum Mainnet." };
       }
@@ -206,7 +208,7 @@ export function useEnsSubdomain(): UseEnsSubdomainResult {
           ownerAddress: ownerAddress.toLowerCase(),
           expiry,
           durationSeconds,
-          chainId,
+          chainId: numericId,
         },
         { accessToken }
       );

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePrivy } from '@privy-io/react-auth';
 import { usePrivyWallet } from '@/hooks/usePrivyWallet';
 import { useEnsSubdomain } from '@/hooks/useEnsSubdomain';
-import { getSelectableChains, isTestnet, ChainDefinition } from '@/web3/chains';
+import { getAllChains, ChainInfo, getChain } from '@/web3/config/chain-registry';
 import { Avatar } from './Avatar';
 import { ClaimEnsSubdomainModal } from '../ens/ClaimEnsSubdomainModal';
 import { Switch } from './Switch';
@@ -43,7 +43,7 @@ export function UserMenu() {
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Network configurations
-  const currentChainId = chainId;
+  const currentInternalId = getChain(chainId)?.id;
 
   // Get email (may be undefined)
   const email = user?.email?.address;
@@ -100,15 +100,18 @@ export function UserMenu() {
   // Early return AFTER all hooks
   if (!email) return null;
 
-  const handleNetworkSwitch = async (targetChainId: number) => {
+  const handleNetworkSwitch = async (identifier: string | number) => {
     try {
       if (!embeddedWallet) {
         throw new Error('Embedded wallet not found');
       }
 
-      if (currentChainId === targetChainId) return;
+      const targetChain = getChain(identifier);
+      if (!targetChain) return;
 
-      await embeddedWallet.switchChain(targetChainId);
+      if (currentInternalId === targetChain.id) return;
+
+      await embeddedWallet.switchChain(targetChain.chainId);
     } catch {
       // console.error('Failed to switch chain:', error);
     }
@@ -210,8 +213,8 @@ export function UserMenu() {
             </div>
 
             {/* Dynamic Network Selector */}
-            {getSelectableChains().map((chain: ChainDefinition) => {
-              const isChainTestnet = isTestnet(chain.chainId);
+            {getAllChains().map((chain: ChainInfo) => {
+              const isChainTestnet = getChain(chain.chainId)?.isTestnet;
               const safeAddress = isChainTestnet
                 ? profile?.safe_wallet_address_testnet
                 : profile?.safe_wallet_address_mainnet;
@@ -221,9 +224,9 @@ export function UserMenu() {
                   <div className="flex items-center gap-3 text-sm font-medium text-white/70">
                     <span className="flex-1">{chain.name}</span>
                     <Switch
-                      checked={currentChainId === chain.chainId}
+                      checked={currentInternalId === chain.id}
                       onCheckedChange={(checked) => {
-                        if (checked) handleNetworkSwitch(chain.chainId);
+                        if (checked) handleNetworkSwitch(chain.id);
                       }}
                       gradient={gradient}
                     />
