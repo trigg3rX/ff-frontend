@@ -63,7 +63,7 @@ export default function NavBar() {
                 <UserMenu />
               </div>
             ) : (
-              <Button onClick={login}>
+              <Button onClick={() => login({ loginMethods: ['email'] })}>
                 <BiLogInCircle className="w-4 h-4" />
                 <span className="hidden sm:inline">Sign In</span>
                 <span className="sm:hidden">Sign In</span>
